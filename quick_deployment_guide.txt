@@ -13,7 +13,7 @@ app = Flask(
 )
 and
 NOTE save the postgres url to the .env!
-app.config['SQLALCHEMY_DATABASE_URI']=postgresql://{retrieve this from from render}
+app.config['SQLALCHEMY_DATABASE_URI']=postgresql://{retrieve this from from render, external database}
 and
 @app.errorhandler(404)
 def not_found(e):

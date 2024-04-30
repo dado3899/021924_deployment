@@ -5,7 +5,7 @@
 # flask db upgrade 
 
 # Standard imports/boilerplate setup (We added session)
-from flask import request, session
+from flask import request, session, render_template
 from flask_migrate import Migrate
 from flask_restful import Resource
 from flask_cors import CORS
@@ -36,15 +36,17 @@ import os
 
 @app.before_request
 def check_credentials():
-    valid_routes = ("/check_sessions","/login","/signup")
+    invalid_routes = ("/api/change_password","/api/blog/<int:id>",)
     # If the route is not in valid routes but the user is logged in 
-    if request.path not in valid_routes and 'user_id' not in session:
+    if request.path in invalid_routes and 'user_id' not in session:
+        print("Unauth")
         return {"error": "please login"},401
     else:
         pass
 
-@app.route('/login', methods = ["POST"])
+@app.route('/api/login', methods = ["POST"])
 def login():
+
     data = request.get_json()
     user = User.query.filter(User.username == data["username"]).first()
     if user:
@@ -57,7 +59,7 @@ def login():
     else:
         return {"error":"Not valid username"},400
 
-@app.route('/check_sessions')
+@app.route('/api/check_sessions')
 def check_sessions():
     print(session)
     if session.get("user_id"):
@@ -66,12 +68,12 @@ def check_sessions():
     else:
         return {"error": "no user logged in"},401
     
-@app.route('/logout', methods=["DELETE"])
+@app.route('/api/logout', methods=["DELETE"])
 def logout():
     session.pop('user_id')
     return {}, 204
 
-@app.route('/blog/<int:id>')
+@app.route('/api/blog/<int:id>')
 def get_blog(id):
     if not session.get('reads'):
         session['reads'] = 0
@@ -84,7 +86,7 @@ def get_blog(id):
     else:
         return {'error': 'pay me monies'},400
     
-@app.route('/signup', methods = ["POST"])
+@app.route('/api/signup', methods = ["POST"])
 def signup():
     try:
         data = request.get_json()
@@ -99,7 +101,7 @@ def signup():
         print(e)
         return {"error":"cannot create user"},400
 
-@app.route('/change_password',methods=['PATCH'])
+@app.route('/api/change_password',methods=['PATCH'])
 def update_password():
     data= request.get_json()
     user = User.query.filter(User.id == data['id']).first()
@@ -111,6 +113,10 @@ def update_password():
     else:
         return {'error': 'Not valid existing password'},400
 
+
+@app.errorhandler(404)
+def not_found(e):
+    return render_template("index.html")
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

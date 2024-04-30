@@ -14,7 +14,7 @@ function App() {
 
   console.log(user)
   useEffect(()=>{
-    fetch('/check_sessions')
+    fetch('/api/check_sessions')
     .then(r=>{
       if(r.ok){
         return r.json()
@@ -28,7 +28,7 @@ function App() {
 
   function login(e){
     e.preventDefault()
-    fetch('/login',
+    fetch('/api/login',
     {
       method: "POST",
       headers: {
@@ -66,7 +66,7 @@ function App() {
 
   function signup_user(e){
     e.preventDefault()
-    fetch('/signup',
+    fetch('/api/signup',
     {
       method: "POST",
       headers: {
@@ -94,18 +94,18 @@ function App() {
   }
 
   function logout(){
-    fetch('/logout',{
+    fetch('/api/logout',{
       method: "DELETE"
     })
     .then(r=> setUser(undefined))
   }
   function fetchBlog(){
-    fetch('/blog/1')
+    fetch('/api/blog/1')
     .then(r=>r.json())
     .then(data=> console.log(data))
   }
   function handlePasswordChange(){
-    fetch('change_password',{
+    fetch('/api/change_password',{
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
